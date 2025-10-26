@@ -1,0 +1,70 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: currency-postgres
+    environment:
+      POSTGRES_DB: currencydb
+      POSTGRES_USER: currencyuser
+      POSTGRES_PASSWORD: currencypass123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - currency-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U currencyuser -d currencydb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: currency-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - currency-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: currency-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/currencydb
+      SPRING_DATASOURCE_USERNAME: currencyuser
+      SPRING_DATASOURCE_PASSWORD: currencypass123
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      EXCHANGE_API_KEY: b741f29e8dd7aa072633663f
+      CRYPTO_API_KEY: demo_key_coingecko
+      NEWS_API_KEY: 92fd73c5927c405489364c331e2d89af
+      JWT_SECRET: your_super_secret_jwt_key_change_this_in_production_min_256_bits_length
+      MOCK_MODE: false
+      CORS_ALLOWED_ORIGINS: http://localhost:3000,http://localhost:5173,http://localhost
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - currency-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  currency-network:
+    driver: bridge

@@ -1,0 +1,224 @@
+{
+  "info": {
+    "name": "Currency Converter API",
+    "description": "Complete API collection for Currency Converter application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"Test User\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"]}
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["const response = pm.response.json();", "pm.collectionVariables.set('token', response.token);"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"]}
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"your_refresh_token_here\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/auth/refresh", "host": ["{{baseUrl}}"], "path": ["auth", "refresh"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rates",
+      "item": [
+        {
+          "name": "Get Latest Rates",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/rates/latest?base=USD",
+              "host": ["{{baseUrl}}"],
+              "path": ["rates", "latest"],
+              "query": [{"key": "base", "value": "USD"}]
+            }
+          }
+        },
+        {
+          "name": "Convert Currency",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/rates/convert?from=USD&to=INR&amount=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["rates", "convert"],
+              "query": [
+                {"key": "from", "value": "USD"},
+                {"key": "to", "value": "INR"},
+                {"key": "amount", "value": "100"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Historical Rates",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/rates/historical?base=USD&target=INR&period=1M",
+              "host": ["{{baseUrl}}"],
+              "path": ["rates", "historical"],
+              "query": [
+                {"key": "base", "value": "USD"},
+                {"key": "target", "value": "INR"},
+                {"key": "period", "value": "1M"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Predict Rates",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/rates/predict?base=USD&target=INR",
+              "host": ["{{baseUrl}}"],
+              "path": ["rates", "predict"],
+              "query": [
+                {"key": "base", "value": "USD"},
+                {"key": "target", "value": "INR"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Alerts",
+      "item": [
+        {
+          "name": "Get User Alerts",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/alerts", "host": ["{{baseUrl}}"], "path": ["alerts"]}
+          }
+        },
+        {
+          "name": "Create Alert",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"baseCurrency\": \"USD\",\n  \"targetCurrency\": \"INR\",\n  \"operator\": \"<\",\n  \"threshold\": 80.0,\n  \"enabled\": true\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/alerts", "host": ["{{baseUrl}}"], "path": ["alerts"]}
+          }
+        },
+        {
+          "name": "Delete Alert",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/alerts/1", "host": ["{{baseUrl}}"], "path": ["alerts", "1"]}
+          }
+        },
+        {
+          "name": "Toggle Alert",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/alerts/1/toggle", "host": ["{{baseUrl}}"], "path": ["alerts", "1", "toggle"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Crypto",
+      "item": [
+        {
+          "name": "Get Crypto Prices",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/crypto/prices?currency=INR",
+              "host": ["{{baseUrl}}"],
+              "path": ["crypto", "prices"],
+              "query": [{"key": "currency", "value": "INR"}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "News",
+      "item": [
+        {
+          "name": "Get Forex News",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/news/forex", "host": ["{{baseUrl}}"], "path": ["news", "forex"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chatbot",
+      "item": [
+        {
+          "name": "Query Chatbot",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"What's the rate for USD to INR?\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/chatbot/query", "host": ["{{baseUrl}}"], "path": ["chatbot", "query"]}
+          }
+        }
+      ]
+    }
+  ]
+}
